@@ -3,8 +3,7 @@ mod api;
 use api::handler;
 use api::models::*;
 
-use actix_web::{get, web, App, HttpServer};
-use std::time::{SystemTime};
+use actix_web::{web, App, HttpServer};
 use std::sync::{Arc, RwLock};
 
 #[actix_web::main]

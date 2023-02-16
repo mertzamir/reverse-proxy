@@ -1,19 +1,26 @@
 use serde::{Deserialize};
+use reqwest;
 use std::collections::HashMap;
-use std::time::{Duration, SystemTime};
-
-const CACHE_TTL_SECONDS: u64 = 30;
+use std::time::{SystemTime};
 
 // Struct for parsing the origin server URL
 #[derive(Debug, Deserialize)]
 pub struct OriginServer {
-    pub url: String,
+    url: String,
 }
 
-// Cache
+impl OriginServer {
+    pub fn get_url(&self) -> String {
+        self.url.clone()
+    }
+}
+
+// Cache Models and Implementations
 #[derive(Debug)]
 pub struct CachedResponse {
-    response: String,
+    headers: reqwest::header::HeaderMap,
+    status: reqwest::StatusCode,
+    body: Vec<u8>,
     expiration: SystemTime,
 }
 
@@ -33,9 +40,8 @@ impl Cache {
         self.data.get(key)
     }
 
-    pub fn put(&mut self, key: String, response: String) {
-        let expiration = SystemTime::now() + Duration::from_secs(CACHE_TTL_SECONDS);
-        self.data.insert(key, CachedResponse { response, expiration });
+    pub fn put(&mut self, key: &str, cached_response: CachedResponse) {
+        self.data.insert(key.to_string(), cached_response);
     }
 
     pub fn remove_expired_entries(&mut self) {
@@ -45,8 +51,30 @@ impl Cache {
 }
 
 impl CachedResponse {
-    pub fn get_response(&self) -> String {
-        self.response.clone()
+    pub fn new(
+        headers: reqwest::header::HeaderMap, 
+        status: reqwest::StatusCode,
+        body: Vec<u8>,
+        expiration: SystemTime
+    ) -> Self {
+        CachedResponse {
+            headers,
+            status,
+            body,
+            expiration
+        }
+    }
+
+    pub fn get_body(&self) -> Vec<u8> {
+        self.body.clone()
+    }
+
+    pub fn get_headers(&self) -> reqwest::header::HeaderMap {
+        self.headers.clone()
+    }
+
+    pub fn get_status(&self) -> reqwest::StatusCode {
+        self.status
     }
 
     pub fn get_expiration(&self) -> SystemTime {
