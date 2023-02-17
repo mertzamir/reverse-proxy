@@ -1,13 +1,14 @@
-use actix_web::{web, error, get, Result, HttpResponse};
+use actix_web::{web, error, Result, HttpResponse};
+use log::{debug, info};
 use reqwest;
+
 use std::sync::{Arc, RwLock};
 use std::time::{Duration, SystemTime};
-use log::{debug, info};
+
 use super::models::{OriginServer, Cache, CachedResponse};
 
 const CACHE_TTL_SECONDS: u64 = 30;
 
-#[get("/")]
 pub async fn index(origin_server: web::Query<OriginServer>, cache: web::Data<Arc<RwLock<Cache>>>) -> Result<HttpResponse, actix_web::Error> {
     let key = origin_server.into_inner().get_url();
     let mut cache = cache.write().unwrap();
