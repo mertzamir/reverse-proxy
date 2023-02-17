@@ -47,7 +47,7 @@ impl Cache {
 
     pub fn remove_expired_entries(&mut self) {
         let now = SystemTime::now();
-        self.data.retain(|_, value| value.expiration > now);
+        self.data.retain(|_, value| value.get_expiration() > now);
     }
 }
 

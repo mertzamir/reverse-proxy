@@ -17,7 +17,6 @@ pub async fn index(origin_server: web::Query<OriginServer>, cache: web::Data<Arc
     // Check if the response is already in the cache
     if let Some(cached_response) = cache.get(&key) {
         if cached_response.get_expiration() > SystemTime::now() {
-            // Return the cached response
             debug!("URL found in cache.");
             let mut headers = HttpResponse::build(cached_response.get_status());
             for (header_name, header_value) in cached_response.get_headers().iter() {
@@ -49,7 +48,7 @@ pub async fn index(origin_server: web::Query<OriginServer>, cache: web::Data<Arc
     cache.put(&key, cached_response);
     cache.remove_expired_entries();
 
-    // Populate the HttpResponse with original metadata
+    // Populate the HttpResponse with original data & metadata and return
     let mut headers = HttpResponse::build(status);
     for (header_name, header_value) in cloned_headers.iter() {
         headers.insert_header((header_name.clone(), header_value.clone()));

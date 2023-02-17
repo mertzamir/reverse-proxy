@@ -6,7 +6,8 @@ data (body) and metadata (status code, headers) are copied over to preserve the 
 original response.
 
 It also maintains an in-memory cache with a TTL of 30 seconds, so if the user sends consecutive requests
-with the same URL, the cached response is returned if it's within TTL.
+with the same URL, the cached response is returned if it's within TTL. (Please monitor server logs to see
+which responses are fetched from the origin server and which ones are returned directly from the in-memory cache.)
 
 
 For simplicity, reverse proxy only expects GET requests to the index path ("/"). All the other request
@@ -20,7 +21,7 @@ cargo run
 ```
 
 #### Example Query
-Add the origin server (keyed by "url") to the query parameters
+Specify the origin server in the query parameters with a key of `url`
 ```
 curl localhost:8080/?url=https://httpbin.org/get
 ```
