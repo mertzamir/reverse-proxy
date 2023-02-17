@@ -46,7 +46,6 @@ pub async fn index(origin_server: web::Query<OriginServer>, cache: web::Data<Arc
     let expiration = SystemTime::now() + Duration::from_secs(CACHE_TTL_SECONDS);
     let cached_response = CachedResponse::new(cloned_headers.clone(), status, body.clone(), expiration);
     cache.put(&key, cached_response);
-    // cache.data.insert(key.clone(), cached_response);
     cache.remove_expired_entries();
 
     // Populate the HttpResponse with original metadata
